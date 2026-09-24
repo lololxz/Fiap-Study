@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  password       String
+  avatar         String?   @default("default")
+  xp             Int       @default(0)
+  level          Int       @default(1)
+  streak         Int       @default(0)
+  bestStreak     Int       @default(0)
+  lastStudyDate  DateTime?
+  totalStudyTime Int       @default(0)
+  /// Meta de questões respondidas por dia.
+  dailyGoal      Int       @default(10)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  sessions           Session[]
+  questions          UserQuestionHistory[]
+  reviewItems        ReviewItem[]
+  essays             Essay[]
+  achievements       UserAchievement[]
+  studyPlan          StudyPlan?
+  tutorConversations TutorConversation[]
+  simulados          Simulado[]
+  performances       Performance[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  hash        String   @unique
+  subject     String
+  topic       String
+  difficulty  String
+  question    String
+  options     String
+  answer      String
+  explanation String
+  stepByStep  String
+  createdAt   DateTime @default(now())
+
+  history     UserQuestionHistory[]
+  reviewItems ReviewItem[]
+
+  @@map("questions")
+}
+
+model UserQuestionHistory {
+  id           String   @id @default(cuid())
+  userId       String
+  questionId   String
+  userAnswer   String?
+  isCorrect    Boolean
+  timeSpent    Int      @default(0)
+  answeredAt   DateTime @default(now())
+  subject      String
+  topic        String
+  difficulty   String
+  needsReview  Boolean  @default(false)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@index([userId, answeredAt])
+  @@map("user_question_history")
+}
+
+/// Item de revisão espaçada (SM-2 simplificado) de uma questão já respondida.
+model ReviewItem {
+  id             String    @id @default(cuid())
+  userId         String
+  questionId     String
+  dueAt          DateTime  @default(now())
+  /// Intervalo atual em dias (fracionário para permitir passos curtos).
+  intervalDays   Float     @default(0)
+  ease           Float     @default(2.5)
+  repetitions    Int       @default(0)
+  lapses         Int       @default(0)
+  lastReviewedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId, dueAt])
+  @@map("review_items")
+}
+
+model Essay {
+  id        String   @id @default(cuid())
+  userId    String
+  theme     String
+  content   String
+  wordCount Int      @default(0)
+  version   Int      @default(1)
+  parentId  String?
+  createdAt DateTime @default(now())
+
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grades EssayGrade[]
+
+  @@map("essays")
+}
+
+model EssayGrade {
+  id              String   @id @default(cuid())
+  essayId         String
+  totalScore      Int
+  themeScore      Int
+  structureScore  Int
+  cohesionScore   Int
+  argumentScore   Int
+  grammarScore    Int
+  feedback        String
+  highlights      String
+  suggestions     String
+  positives       String
+  createdAt       DateTime @default(now())
+
+  essay Essay @relation(fields: [essayId], references: [id], onDelete: Cascade)
+
+  @@map("essay_grades")
+}
+
+model Performance {
+  id              String   @id @default(cuid())
+  userId          String
+  subject         String
+  topic           String
+  totalQuestions  Int      @default(0)
+  correctAnswers  Int      @default(0)
+  wrongAnswers    Int      @default(0)
+  avgTimeSpent    Float    @default(0)
+  lastPracticed   DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subject, topic])
+  @@map("performances")
+}
+
+model Achievement {
+  id          String @id @default(cuid())
+  code        String @unique
+  name        String
+  description String
+  icon        String
+  xpReward    Int    @default(0)
+  category    String
+
+  users UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model StudyPlan {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  plan        String
+  generatedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("study_plans")
+}
+
+model TutorConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  messages  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tutor_conversations")
+}
+
+model Simulado {
+  id             String    @id @default(cuid())
+  userId         String
+  title          String
+  subjects       String
+  difficulty     String
+  totalQuestions Int
+  correctAnswers Int       @default(0)
+  wrongAnswers   Int       @default(0)
+  score          Float     @default(0)
+  timeLimit      Int       @default(0)
+  timeUsed       Int       @default(0)
+  status         String    @default("pending")
+  questions      String
+  startedAt      DateTime  @default(now())
+  finishedAt     DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("simulados")
+}

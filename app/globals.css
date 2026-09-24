@@ -1,0 +1,267 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Neutro moderno — base quase monocromática com acento único violeta */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
+
+    /* #7C5CFF */
+    --primary: 252 100% 68%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 10%;
+
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 10% 10%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 58% 38%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 32 95% 48%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 252 100% 68%;
+
+    /* Superfícies do shell */
+    --sidebar: 240 6% 99%;
+    --sidebar-foreground: 240 10% 4%;
+    --sidebar-border: 240 6% 91%;
+    --sidebar-accent: 240 5% 95%;
+    --sidebar-accent-foreground: 240 10% 10%;
+    --sidebar-primary: 252 100% 68%;
+    --sidebar-primary-foreground: 0 0% 100%;
+
+    /* Séries de gráfico */
+    --chart-1: 252 100% 68%;
+    --chart-2: 190 88% 46%;
+    --chart-3: 152 58% 42%;
+    --chart-4: 32 95% 54%;
+    --chart-5: 336 82% 60%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    /* #0A0A0B */
+    --background: 240 5% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 5% 7%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 5% 7%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 252 100% 76%;
+    --primary-foreground: 252 60% 10%;
+
+    --secondary: 240 5% 13%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 5% 13%;
+    --muted-foreground: 240 5% 62%;
+
+    --accent: 240 5% 15%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62% 46%;
+    --destructive-foreground: 0 0% 98%;
+
+    --success: 152 50% 44%;
+    --success-foreground: 152 80% 8%;
+
+    --warning: 32 90% 56%;
+    --warning-foreground: 32 90% 8%;
+
+    --border: 240 5% 15%;
+    --input: 240 5% 18%;
+    --ring: 252 100% 72%;
+
+    --sidebar: 240 5% 5%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-border: 240 5% 13%;
+    --sidebar-accent: 240 5% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-primary: 252 100% 76%;
+    --sidebar-primary-foreground: 252 60% 10%;
+
+    --chart-1: 252 100% 76%;
+    --chart-2: 190 85% 58%;
+    --chart-3: 152 52% 52%;
+    --chart-4: 32 92% 62%;
+    --chart-5: 336 80% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Números tabulares onde há métricas (XP, contadores, timer) */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    @apply bg-primary/25;
+  }
+
+  /* Scrollbar discreta, no tom do tema */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+    border: 3px solid hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Foco visível consistente em todo o app */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring/60 ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer utilities {
+  /* Malha sutil de fundo — substitui os gradientes coloridos antigos */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.55) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.55) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .bg-dots {
+    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Brilho radial do acento, usado no login e em cabeçalhos */
+  .glow-accent {
+    background-image: radial-gradient(
+      60% 60% at 50% 0%,
+      hsl(var(--primary) / 0.16) 0%,
+      transparent 100%
+    );
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-br from-foreground to-foreground/55 bg-clip-text text-transparent;
+  }
+
+  .shadow-subtle {
+    box-shadow:
+      0 1px 2px 0 hsl(var(--foreground) / 0.04),
+      0 0 0 1px hsl(var(--border) / 0.6);
+  }
+
+  .shadow-lifted {
+    box-shadow:
+      0 4px 16px -4px hsl(var(--foreground) / 0.08),
+      0 0 0 1px hsl(var(--border));
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.25s ease-out both;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--accent)) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Mantidos para compatibilidade com telas existentes */
+.animate-in {
+  animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.question-card-correct {
+  @apply border-success/50 bg-success/5;
+}
+
+.question-card-wrong {
+  @apply border-destructive/50 bg-destructive/5;
+}
