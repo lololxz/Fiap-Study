@@ -1,8 +1,24 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  const demoEmail = 'demo@fiap.local';
+  const demoPassword = 'Fiap@123456';
+
+  await prisma.user.upsert({
+    where: { email: demoEmail },
+    update: { password: await bcrypt.hash(demoPassword, 12) },
+    create: {
+      name: 'Usuário Demo',
+      email: demoEmail,
+      password: await bcrypt.hash(demoPassword, 12),
+    },
+  });
+
+  console.log(`Demo user ready: ${demoEmail}`);
+
   const achievements = [
     { code: 'FIRST_QUESTION', name: 'Primeira Questão', description: 'Respondeu sua primeira questão', icon: '🎯', xpReward: 50, category: 'milestone' },
     { code: 'TEN_QUESTIONS', name: '10 Questões', description: 'Respondeu 10 questões', icon: '⭐', xpReward: 100, category: 'milestone' },

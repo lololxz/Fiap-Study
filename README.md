@@ -37,6 +37,14 @@ npm run dev
 
 Abra <http://localhost:3000>, crie uma conta em `/register`.
 
+Para entrar rapidamente no ambiente local após executar o seed, use:
+
+- Email: `demo@fiap.local`
+- Senha: `Fiap@123456`
+
+Essa conta é apenas para desenvolvimento. Troque ou remova a senha antes de
+usar o seed em qualquer ambiente compartilhado ou de produção.
+
 ### Sobre `.env` e `.env.local`
 
 - **`.env`** — versionado, contém apenas o `DATABASE_URL` local (não é segredo).
